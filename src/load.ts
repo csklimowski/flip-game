@@ -25,6 +25,7 @@ export class LoadScene extends Phaser.Scene {
         this.load.image('tile15', 'img/15.png');
         this.load.image('tile16', 'img/16.png');
         this.load.image('player', 'img/player.png');
+        this.load.image('enemy', 'img/enemy.png');
     }
 
     create() {

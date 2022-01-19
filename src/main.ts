@@ -3,10 +3,16 @@
 class Enemy extends Phaser.GameObjects.Sprite {
 
     orientation: number;
+    awake: boolean;
     tile: Tile;
 
-    constructor(scene: Phaser.Scene, tile: Tile) {
+    constructor(scene: Phaser.Scene, tile: Tile, awake: boolean) {
         super(scene, tile.x, tile.y, 'enemy');
+        this.orientation = 2;
+        this.awake = awake;
+        if (!awake) {
+            this.setAngle(180);
+        }
         scene.add.existing(this);
     }
 }
@@ -46,6 +52,11 @@ class Tile extends Phaser.GameObjects.Sprite {
             this.anims.play(fast ? 'flip-black-instant' : 'flip-black');
             this.color = 0;
         }
+
+        if (this.enemy) {
+            this.enemy.awake = !this.enemy.awake;
+            this.enemy.setAngle(this.enemy.angle + 180);
+        }
     }
 }
 
@@ -62,7 +73,7 @@ let levels = {
     flipTutorial: [
         '     ',
         ' 101 ',
-        'N101X',
+        'N1a1X',
         ' 101 ',
         '     '
     ],
@@ -79,6 +90,7 @@ export class MainScene extends Phaser.Scene {
 
     grid: Tile[][];
     player: Player;
+    enemies: Enemy[];
     
     constructor() {
         super('main');
@@ -86,7 +98,9 @@ export class MainScene extends Phaser.Scene {
 
     create() {
 
-        let level = levels.chaseTutorial
+        let level = levels.flipTutorial
+
+        this.enemies = [];
 
 
         this.player = new Player(this);
@@ -101,17 +115,23 @@ export class MainScene extends Phaser.Scene {
                 if (type === ' ') {
                     row.push(null);
                 } else {
-                    let tile = new Tile(this, r, c, Number(type === 'N' || type === '1' || type === 'X'));
+                    let tile = new Tile(this, r, c, Number(type === 'N' || type === '1' || type === 'A' || type === 'S' || type === 'X'));
 
                     if (type === 'N' || type === 'n') {
                         tile.entrance = true;
                         this.player.tile = tile;
-                        this.player.x = colToX(tile.col);
-                        this.player.y = rowToY(tile.row);
+                        this.player.x = tile.x;
+                        this.player.y = tile.y;
                     }
 
                     if (type === 'X' || type === 'x') {
                         tile.exit = true;
+                    }
+
+                    if (type === 'A' || type === 'a' || type == 'S' || type === 's') {
+                        let enemy = new Enemy(this, tile, (type === 'A' || type === 'a'));
+                        tile.enemy = enemy;
+                        this.enemies.push(enemy);
                     }
 
                     row.push(tile);
@@ -129,30 +149,46 @@ export class MainScene extends Phaser.Scene {
             let leftCol = this.player.tile.col - 1;
             while (leftCol >= 0) {
                 let leftTile = this.grid[this.player.tile.row][leftCol];
-                if (leftTile) leftTile.flip();
-                leftCol -= 1;
+                if (leftTile && leftTile.color === this.player.tile.color) {
+                    leftTile.flip();
+                    leftCol -= 1;
+                } else {
+                    break;
+                }
             }
 
             let rightCol = this.player.tile.col + 1;
             while (rightCol < this.grid[0].length) {
                 console.log(rightCol);
                 let rightTile = this.grid[this.player.tile.row][rightCol];
-                if (rightTile) rightTile.flip();
-                rightCol += 1;
+                if (rightTile && rightTile.color === this.player.tile.color) {
+                    rightTile.flip();
+                    rightCol += 1;
+                } else {
+                    break;
+                }
             }
 
             let upRow = this.player.tile.row - 1;
             while (upRow >= 0) {
                 let upTile = this.grid[upRow][this.player.tile.col];
-                if (upTile) upTile.flip();
-                upRow -= 1;
+                if (upTile && upTile.color === this.player.tile.color) {
+                    upTile.flip();
+                    upRow -= 1;
+                } else {
+                    break;
+                }
             }
 
             let downRow = this.player.tile.row + 1;
             while (downRow < this.grid.length) {
                 let downTile = this.grid[downRow][this.player.tile.col];
-                if (downTile) downTile.flip();
-                downRow += 1;
+                if (downTile && downTile.color === this.player.tile.color) {
+                    downTile.flip();
+                    downRow += 1;
+                } else {
+                    break;
+                }
             }
             
             this.player.tile.flip();
