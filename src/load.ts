@@ -36,6 +36,7 @@ export class LoadScene extends Phaser.Scene {
                 { key: 'tile16', frame: null },
                 { key: 'tile15', frame: null },
                 { key: 'tile15', frame: null },
+                { key: 'tile15', frame: null },
                 { key: 'tile01', frame: null },
                 { key: 'tile03', frame: null },
                 { key: 'tile04', frame: null },
@@ -52,8 +53,18 @@ export class LoadScene extends Phaser.Scene {
         });
 
         this.anims.create({
+            key: 'ready-black',
+            frames: [
+                { key: 'tile16', frame: null },
+                { key: 'tile15', frame: null }
+            ],
+            frameRate: 30
+        });
+
+        this.anims.create({
             key: 'flip-black-immediate',
             frames: [
+                { key: 'tile01', frame: null },
                 { key: 'tile03', frame: null },
                 { key: 'tile04', frame: null },
                 { key: 'tile05', frame: null },
@@ -74,6 +85,7 @@ export class LoadScene extends Phaser.Scene {
                 { key: 'tile08', frame: null },
                 { key: 'tile07', frame: null },
                 { key: 'tile07', frame: null },
+                { key: 'tile07', frame: null },
                 { key: 'tile09', frame: null },
                 { key: 'tile11', frame: null },
                 { key: 'tile12', frame: null },
@@ -91,8 +103,19 @@ export class LoadScene extends Phaser.Scene {
         });
 
         this.anims.create({
+            key: 'ready-white',
+            frames: [
+                { key: 'tile08', frame: null },
+                { key: 'tile07', frame: null }
+            ],
+            
+            frameRate: 30
+        });
+
+        this.anims.create({
             key: 'flip-white-immediate',
             frames: [
+                { key: 'tile09', frame: null },
                 { key: 'tile11', frame: null },
                 { key: 'tile12', frame: null },
                 { key: 'tile13', frame: null },

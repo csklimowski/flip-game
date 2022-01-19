@@ -46,10 +46,10 @@ class Tile extends Phaser.GameObjects.Sprite {
     flip(fast?: boolean) {
 
         if (this.color === 0) {
-            this.anims.play(fast ? 'flip-white-instant' : 'flip-white');
+            this.anims.play(fast ? 'flip-white-immediate' : 'flip-white');
             this.color = 1;
         } else {
-            this.anims.play(fast ? 'flip-black-instant' : 'flip-black');
+            this.anims.play(fast ? 'flip-black-immediate' : 'flip-black');
             this.color = 0;
         }
 
@@ -57,6 +57,19 @@ class Tile extends Phaser.GameObjects.Sprite {
             this.enemy.awake = !this.enemy.awake;
             this.enemy.setAngle(this.enemy.angle + 180);
         }
+    }
+
+    ready() {
+        this.anims.play(this.color === 0 ? 'ready-white' : 'ready-black')
+    }
+
+    flipDelay(delay, fast?: boolean) {
+        this.scene.time.addEvent({
+            callback: this.flip,
+            callbackScope: this,
+            delay: delay,
+            args: [fast || false]
+        })
     }
 }
 
@@ -83,6 +96,13 @@ let levels = {
         ' 101 ',
         'N111X',
         '     '
+    ],
+    openSpace: [
+        ' 0101X',
+        ' 1111 ',
+        ' 1010 ',
+        'N1111 ',
+        '      '
     ]
 };
 
@@ -98,7 +118,7 @@ export class MainScene extends Phaser.Scene {
 
     create() {
 
-        let level = levels.flipTutorial
+        let level = levels.openSpace
 
         this.enemies = [];
 
@@ -150,7 +170,8 @@ export class MainScene extends Phaser.Scene {
             while (leftCol >= 0) {
                 let leftTile = this.grid[this.player.tile.row][leftCol];
                 if (leftTile && leftTile.color === this.player.tile.color) {
-                    leftTile.flip();
+                    leftTile.ready();
+                    leftTile.flipDelay(100 + 100 * (this.player.tile.col - leftCol), true);
                     leftCol -= 1;
                 } else {
                     break;
@@ -162,7 +183,8 @@ export class MainScene extends Phaser.Scene {
                 console.log(rightCol);
                 let rightTile = this.grid[this.player.tile.row][rightCol];
                 if (rightTile && rightTile.color === this.player.tile.color) {
-                    rightTile.flip();
+                    rightTile.ready();
+                    rightTile.flipDelay(100 + 100 * (rightCol - this.player.tile.col), true);
                     rightCol += 1;
                 } else {
                     break;
@@ -173,7 +195,8 @@ export class MainScene extends Phaser.Scene {
             while (upRow >= 0) {
                 let upTile = this.grid[upRow][this.player.tile.col];
                 if (upTile && upTile.color === this.player.tile.color) {
-                    upTile.flip();
+                    upTile.ready();
+                    upTile.flipDelay(100 + 100 * (this.player.tile.row - upRow), true);
                     upRow -= 1;
                 } else {
                     break;
@@ -184,7 +207,8 @@ export class MainScene extends Phaser.Scene {
             while (downRow < this.grid.length) {
                 let downTile = this.grid[downRow][this.player.tile.col];
                 if (downTile && downTile.color === this.player.tile.color) {
-                    downTile.flip();
+                    downTile.ready();
+                    downTile.flipDelay(100 + 100 * (downRow - this.player.tile.row), true);
                     downRow += 1;
                 } else {
                     break;
